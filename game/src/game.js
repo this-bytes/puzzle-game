@@ -304,6 +304,12 @@ class Shade {
         const screenX = this.x;
         const screenY = toScreenY(this.y, this.height);
         
+        // Debug: Draw a marker even if off-screen
+        ctx.save();
+        ctx.fillStyle = '#FF00FF'; // Magenta for debugging
+        ctx.fillRect(Math.max(0, screenX), Math.max(0, screenY), 5, 5);
+        ctx.restore();
+        
         // Draw connection line to Source
         ctx.save();
         ctx.strokeStyle = COLORS.CONNECTION_LINE;
@@ -313,9 +319,14 @@ class Shade {
         const sourceScreenX = game.source.x + game.source.width / 2;
         const sourceScreenY = toScreenY(game.source.y, game.source.height / 2);
         ctx.moveTo(sourceScreenX, sourceScreenY);
-        ctx.lineTo(screenX + this.width / 2, screenY + this.height / 2);
+        ctx.lineTo(Math.max(0, screenX + this.width / 2), Math.max(0, screenY + this.height / 2));
         ctx.stroke();
         ctx.restore();
+        
+        // Only draw shade if on screen
+        if (screenX < -this.width || screenX > CANVAS_WIDTH || screenY < -this.height || screenY > CANVAS_HEIGHT) {
+            return; // Off screen
+        }
         
         // Draw glow
         ctx.save();
