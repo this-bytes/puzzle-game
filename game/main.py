@@ -15,7 +15,7 @@ def main():
     
     # Create window
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    pygame.display.set_caption("Shade & Source - Level 1: The Basic Divide")
+    pygame.display.set_caption("Shade & Source - Where you stand determines where you cannot")
     
     # Create game surface (internal resolution)
     game_surface = pygame.Surface((GAME_WIDTH, GAME_HEIGHT))
