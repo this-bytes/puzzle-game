@@ -23,17 +23,22 @@ class TutorialLevel1:
     
     def __init__(self):
         self.platforms = [
-            {'x': 0, 'y': 5, 'width': 30, 'height': 2},   # Ground
+            {'x': 0, 'y': 10, 'width': 30, 'height': 2},   # Ground platform
         ]
         
-        self.source = Source(5, 7)
-        self.light = LightSource(5, 15, 10)  # Small light directly above
+        # Source starts ON the platform (y = platform_top - source_height)
+        # Platform is at y=10, height=2, so top is at y=10
+        # Source height is 0.625, so Source.y should be 10 - 0.625 = 9.375
+        # But we'll position at 9.5 for safety
+        self.source = Source(3, 9.5)
+        self.light = LightSource(12, 18, 12)  # Light above, larger radius
         self.shade = Shade(-2)
         
         self.projector = ShadowProjector()
         self.death_detector = DeathDetector()
         
-        self.goal = {'x': 20, 'y': 7, 'width': 3, 'height': 3}
+        # Goal is on the platform, at the right side
+        self.goal = {'x': 24, 'y': 8, 'width': 3, 'height': 2}
         
         self.deaths = 0
         self.start_time = pygame.time.get_ticks()
@@ -43,19 +48,19 @@ class TutorialLevel1:
         self.tutorial = TutorialManager()
         self.tutorial.add_step(
             "Welcome to Shade & Source!",
-            "This is Source (the white character). Use A/D or Arrow Keys to move right.",
+            "You control Source (the white character). Use A/D or Arrow Keys to move right.",
             lambda: self.source.x > 10,
-            highlight={'x': 3, 'y': 5, 'width': 4, 'height': 4, 'grid': True}
+            highlight={'x': 1, 'y': 8, 'width': 4, 'height': 4, 'grid': True}
         )
         self.tutorial.add_step(
             "Stay in the Light",
-            "Source must stay in the light circle to survive. Try moving outside the light.",
-            lambda: self.deaths > 0,
-            highlight={'x': self.light.x - 10, 'y': self.light.y - 10, 'width': 20, 'height': 20, 'grid': True}
+            "Source dies in shadow! Stay in the glowing light circle. Try moving to the edge to see what happens.",
+            lambda: self.source.x > 18,
+            highlight={'x': self.light.x - 12, 'y': self.light.y - 12, 'width': 24, 'height': 24, 'grid': True}
         )
         self.tutorial.add_step(
-            "Reach the Goal",
-            "Now reach the green goal area while staying in light. Press R to reset if you die.",
+            "Reach the GOAL",
+            "The GREEN area is the GOAL. Reach it to complete the tutorial! Press R to reset if needed.",
             lambda: self.completed,
             highlight={'x': self.goal['x'], 'y': self.goal['y'], 'width': self.goal['width'], 'height': self.goal['height'], 'grid': True}
         )
@@ -123,7 +128,7 @@ class TutorialLevel1:
         # Light source
         self.light.render(surface)
         
-        # Goal
+        # Goal with label
         goal_rect = pygame.Rect(
             self.goal['x'] * GRID_UNIT_SIZE,
             self.goal['y'] * GRID_UNIT_SIZE,
@@ -131,6 +136,15 @@ class TutorialLevel1:
             self.goal['height'] * GRID_UNIT_SIZE
         )
         pygame.draw.rect(surface, COLOR_GOAL, goal_rect)
+        
+        # Add "GOAL" text on the goal
+        goal_font = pygame.font.Font(None, 32)
+        goal_text = goal_font.render("GOAL", True, (0, 100, 50))
+        text_rect = goal_text.get_rect(center=(
+            (self.goal['x'] + self.goal['width']/2) * GRID_UNIT_SIZE,
+            (self.goal['y'] + self.goal['height']/2) * GRID_UNIT_SIZE
+        ))
+        surface.blit(goal_text, text_rect)
         
         # Entities
         self.source.render(surface)
@@ -165,20 +179,22 @@ class TutorialLevel2:
     
     def __init__(self):
         self.platforms = [
-            {'x': 0, 'y': 8, 'width': 15, 'height': 2},   # Left platform
-            {'x': 20, 'y': 8, 'width': 10, 'height': 2},  # Right platform
+            {'x': 0, 'y': 12, 'width': 15, 'height': 2},   # Left platform
+            {'x': 18, 'y': 12, 'width': 12, 'height': 2},  # Right platform
         ]
         
         self.shadow_floor = {'x': 0, 'y': -2, 'width': 30, 'height': 2}
         
-        self.source = Source(5, 10)
-        self.light = LightSource(7, 18, 14)
+        # Source starts ON the left platform
+        self.source = Source(5, 11.5)
+        self.light = LightSource(10, 18, 16)
         self.shade = Shade(self.shadow_floor['y'])
         
         self.projector = ShadowProjector()
         self.death_detector = DeathDetector()
         
-        self.goal = {'x': 22, 'y': 10, 'width': 3, 'height': 3}
+        # Goal is on the right platform
+        self.goal = {'x': 24, 'y': 10, 'width': 3, 'height': 2}
         
         self.deaths = 0
         self.start_time = pygame.time.get_ticks()
@@ -288,7 +304,7 @@ class TutorialLevel2:
         # Light source
         self.light.render(surface)
         
-        # Goal
+        # Goal with label
         goal_rect = pygame.Rect(
             self.goal['x'] * GRID_UNIT_SIZE,
             self.goal['y'] * GRID_UNIT_SIZE,
@@ -296,6 +312,15 @@ class TutorialLevel2:
             self.goal['height'] * GRID_UNIT_SIZE
         )
         pygame.draw.rect(surface, COLOR_GOAL, goal_rect)
+        
+        # Add "GOAL" text
+        goal_font = pygame.font.Font(None, 32)
+        goal_text = goal_font.render("GOAL", True, (0, 100, 50))
+        text_rect = goal_text.get_rect(center=(
+            (self.goal['x'] + self.goal['width']/2) * GRID_UNIT_SIZE,
+            (self.goal['y'] + self.goal['height']/2) * GRID_UNIT_SIZE
+        ))
+        surface.blit(goal_text, text_rect)
         
         # Connection line
         self.connection.render(surface, self.source.x, self.source.y, self.shade.x, self.shade.y)
@@ -334,13 +359,14 @@ class TutorialLevel3:
     
     def __init__(self):
         self.platforms = [
-            {'x': 0, 'y': 8, 'width': 12, 'height': 2},   # Left platform
-            {'x': 18, 'y': 8, 'width': 12, 'height': 2},  # Right platform
+            {'x': 0, 'y': 10, 'width': 12, 'height': 2},   # Left platform
+            {'x': 18, 'y': 10, 'width': 12, 'height': 2},  # Right platform
         ]
         
         self.shadow_floor = {'x': 0, 'y': -2, 'width': 30, 'height': 2}
         
-        self.source = Source(5, 10)
+        # Source starts ON the left platform
+        self.source = Source(5, 9.5)
         self.light = LightSource(10, 18, 16)
         self.shade = Shade(self.shadow_floor['y'])
         
@@ -352,7 +378,8 @@ class TutorialLevel3:
         self.bridge_active = False
         self.bridge_animation = BridgeSpawnAnimation()
         
-        self.goal = {'x': 22, 'y': 10, 'width': 3, 'height': 3}
+        # Goal is on the right platform
+        self.goal = {'x': 23, 'y': 8, 'width': 4, 'height': 2}
         
         self.deaths = 0
         self.start_time = pygame.time.get_ticks()
@@ -407,7 +434,7 @@ class TutorialLevel3:
         # Check laser gate
         if self.laser_gate.check_shade_collision(self.shade):
             if not self.bridge_active and not self.bridge_animation.animating:
-                self.bridge = {'x': 12, 'y': 8, 'width': 6, 'height': 2}
+                self.bridge = {'x': 12, 'y': 10, 'width': 6, 'height': 2}
                 self.bridge_animation.start(self.bridge)
                 # Emit particles
                 self.particles.emit(
@@ -505,7 +532,7 @@ class TutorialLevel3:
             )
             pygame.draw.rect(surface, (160, 160, 160), rect)
         
-        # Goal
+        # Goal with label
         goal_rect = pygame.Rect(
             self.goal['x'] * GRID_UNIT_SIZE,
             self.goal['y'] * GRID_UNIT_SIZE,
@@ -513,6 +540,15 @@ class TutorialLevel3:
             self.goal['height'] * GRID_UNIT_SIZE
         )
         pygame.draw.rect(surface, COLOR_GOAL, goal_rect)
+        
+        # Add "GOAL" text
+        goal_font = pygame.font.Font(None, 32)
+        goal_text = goal_font.render("GOAL", True, (0, 100, 50))
+        text_rect = goal_text.get_rect(center=(
+            (self.goal['x'] + self.goal['width']/2) * GRID_UNIT_SIZE,
+            (self.goal['y'] + self.goal['height']/2) * GRID_UNIT_SIZE
+        ))
+        surface.blit(goal_text, text_rect)
         
         # Connection line
         self.connection.render(surface, self.source.x, self.source.y, self.shade.x, self.shade.y)
